@@ -31,7 +31,6 @@ export default function BookCard({ book, onClick, onAddToCart }: BookCardProps) 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation()
     
-    // NOTE: Using localStorage as per original code. In a production app, use Firestore.
     const cart = localStorage.getItem('cart')
     const cartItems = cart ? JSON.parse(cart) : []
     

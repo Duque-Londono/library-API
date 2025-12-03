@@ -1,17 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-// NOTA: Reemplazo de 'next/navigation' por un dummy para runnability en este entorno
 const useRouter = () => ({
   push: (path: string) => {
-    // Implementación para forzar la redirección en este entorno
     window.location.href = path;
   },
 })
 import axios from 'axios'
 
-// Simulación de las variables de entorno para runnability
-const API_URL = process.env.NEXT_PUBLIC_API_URL // Reemplaza con tu URL real en el proyecto
+const API_URL = process.env.NEXT_PUBLIC_API_URL
 
 export default function Login() {
   const [isLogin, setIsLogin] = useState(true)
@@ -28,7 +25,6 @@ export default function Login() {
     setLoading(true)
 
     try {
-      // --- LÓGICA NO MODIFICADA ---
       const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register'
       const response = await axios.post(`${API_URL}${endpoint}`, {
         email,
@@ -38,9 +34,7 @@ export default function Login() {
       localStorage.setItem('token', response.data.token)
       localStorage.setItem('email', response.data.email)
       router.push('/dashboard')
-      // --- FIN DE LÓGICA NO MODIFICADA ---
     } catch (err: any) {
-      // Manejo de errores simulado/real
       setError(err.response?.data?.error || 'Error de conexión o credenciales inválidas.')
     } finally {
       setLoading(false)
@@ -54,7 +48,6 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gray-900 font-sans text-gray-100 relative overflow-hidden">
       
-      {/* Decoraciones de fondo (Neo-Brutalism / Cyberpunk Glow) */}
       <div className="absolute top-0 left-0 w-80 h-80 bg-purple-600 rounded-full mix-blend-screen filter blur-[150px] opacity-20 animate-pulse-slow"></div>
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-indigo-600 rounded-full mix-blend-screen filter blur-[150px] opacity-20 animate-pulse-slow" style={{ animationDelay: '3s' }}></div>
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzE3MTcxNyIgc3Ryb2tlLW9wYWNpdHk9IjAuNSIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-5"></div>
@@ -76,12 +69,10 @@ export default function Login() {
         }
       `}</style>
       
-      {/* Modal de Bienvenida */}
       {showWelcome && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-fade-in">
           <div className="bg-gray-800 border-2 border-indigo-700/50 rounded-2xl shadow-2xl max-w-2xl w-full animate-slide-up overflow-hidden glow-shadow">
             
-            {/* Header con gradiente */}
             <div className="p-8 text-center bg-gray-900 border-b-2 border-indigo-700/50 relative">
               <div className="relative z-10">
                 <div className="inline-block p-3 bg-purple-600 rounded-xl mb-3 border border-indigo-500 shadow-lg shadow-purple-900/50">
@@ -98,7 +89,6 @@ export default function Login() {
               </div>
             </div>
 
-            {/* Contenido */}
             <div className="p-8">
               <div className="space-y-6">
                 <p className="text-gray-300 text-lg text-center leading-relaxed">
@@ -106,7 +96,6 @@ export default function Login() {
                   Inicia sesión o regístrate para comenzar la búsqueda.
                 </p>
 
-                {/* Features rápidos (Estilo Matriz de Datos) */}
                 <div className="grid grid-cols-3 gap-3">
                   <div className="bg-gray-900 rounded-lg p-3 text-center border border-indigo-700/50 shadow-inner shadow-gray-900">
                     <div className="text-3xl mb-1">⚡</div>
@@ -122,7 +111,6 @@ export default function Login() {
                   </div>
                 </div>
 
-                {/* Botón de cerrar */}
                 <button
                   onClick={closeWelcome}
                   className="w-full py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-bold text-lg tracking-wider hover:from-purple-500 hover:to-indigo-500 transition-all border-2 border-white/20 shadow-lg shadow-purple-900/50 transform hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2"
@@ -138,10 +126,8 @@ export default function Login() {
         </div>
       )}
 
-      {/* Formulario de Login (Foco principal) */}
       <div className="bg-gray-800 border-2 border-indigo-700/50 rounded-2xl p-10 w-full max-w-md relative z-10 animate-slide-up glow-shadow">
         
-        {/* Logo y título */}
         <div className="text-center mb-10">
           <div className="inline-block p-4 bg-gray-900 rounded-2xl mb-4 border border-purple-500 shadow-xl shadow-purple-900/50">
             <svg className="w-10 h-10 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -156,7 +142,6 @@ export default function Login() {
           </p>
         </div>
 
-        {/* Tabs */}
         <div className="flex mb-8 bg-gray-900 rounded-xl p-1.5 border border-gray-700 shadow-inner shadow-gray-900">
           <button
             onClick={() => setIsLogin(true)}
@@ -180,7 +165,6 @@ export default function Login() {
           </button>
         </div>
 
-        {/* Formulario */}
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="group">
             <label className="block text-xs font-mono text-purple-400 mb-2 transition-colors group-focus-within:text-white">

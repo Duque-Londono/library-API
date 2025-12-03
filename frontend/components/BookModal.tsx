@@ -3,8 +3,8 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 
-// Assuming API_URL is defined somewhere
-const API_URL = 'http://localhost:3000' // Placeholder for NEXT_PUBLIC_API_URL
+
+const API_URL = 'http://localhost:3000' 
 
 interface Book {
   key: string
@@ -36,14 +36,9 @@ export default function BookModal({ book, onClose, onAddToCart }: BookModalProps
     const fetchDetails = async () => {
       setLoading(true)
       try {
-        // NOTE: The original code uses API_URL/api/books/${workId}
+        
         const workId = book.key.replace('/works/', '')
-        // NOTE: Since the API_URL is unknown here, I'll mock the response to avoid errors.
-        // In a real environment, the axios call would be used.
-        /*
-        const response = await axios.get(`${API_URL}/api/books/${workId}`)
-        setDetails(response.data)
-        */
+
         await new Promise(resolve => setTimeout(resolve, 500)); // Simulate loading
         setDetails({
             title: book.title,
@@ -77,7 +72,6 @@ export default function BookModal({ book, onClose, onAddToCart }: BookModalProps
   }
 
   const handleAddToCart = () => {
-    // NOTE: Using localStorage as per original code. In a production app, use Firestore.
     const cart = localStorage.getItem('cart')
     const cartItems = cart ? JSON.parse(cart) : []
     
@@ -129,7 +123,6 @@ export default function BookModal({ book, onClose, onAddToCart }: BookModalProps
             </div>
           ) : (
             <div className="flex flex-col md:flex-row gap-8 p-8 md:p-10">
-              {/* Columna de la Imagen */}
               <div className="md:w-1/3 flex justify-center">
                 <div className="w-48 h-72 md:w-full md:aspect-[2/3] bg-gray-700 rounded-xl shadow-2xl overflow-hidden flex items-center justify-center">
                   <img
@@ -143,7 +136,6 @@ export default function BookModal({ book, onClose, onAddToCart }: BookModalProps
                 </div>
               </div>
 
-              {/* Columna de Contenido */}
               <div className="md:w-2/3">
                 <h2 className="text-4xl font-extrabold text-white mb-2 leading-tight">
                   {book.title}

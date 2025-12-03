@@ -61,7 +61,6 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// Verify token
 router.get('/verify', authMiddleware, async (req, res) => {
   try {
     const user = await User.findById(req.userId).select('-password');

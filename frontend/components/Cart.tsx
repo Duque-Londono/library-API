@@ -19,14 +19,13 @@ export default function Cart({ isOpen, onClose }: CartProps) {
   const [cartItems, setCartItems] = useState<CartItem[]>([])
 
   useEffect(() => {
-    // Only load cart if the component is mounted AND it's open (optimisation)
     if (isOpen) {
         loadCart()
     }
   }, [isOpen])
 
   const loadCart = () => {
-    // NOTE: Using localStorage as per original code. In a production app, use Firestore.
+
     const cart = localStorage.getItem('cart')
     if (cart) {
       setCartItems(JSON.parse(cart))
@@ -38,13 +37,13 @@ export default function Cart({ isOpen, onClose }: CartProps) {
   const removeFromCart = (key: string) => {
     const updatedCart = cartItems.filter(item => item.key !== key)
     setCartItems(updatedCart)
-    // NOTE: Using localStorage as per original code. In a production app, use Firestore.
+   
     localStorage.setItem('cart', JSON.stringify(updatedCart))
   }
 
   const clearCart = () => {
     setCartItems([])
-    // NOTE: Using localStorage as per original code. In a production app, use Firestore.
+    
     localStorage.removeItem('cart')
   }
 
@@ -55,7 +54,7 @@ export default function Cart({ isOpen, onClose }: CartProps) {
   const handleCheckout = () => {
     if (cartItems.length === 0) return
     
-    // Replaced alert with console message as per instructions
+  
     console.log(`¡Compra realizada! Total: $${getTotalPrice()} USD. Gracias por tu compra 📚`)
     clearCart()
     onClose()
@@ -80,7 +79,6 @@ export default function Cart({ isOpen, onClose }: CartProps) {
       >
         <div className="bg-gray-900 text-gray-200 h-full flex flex-col border-l border-blue-700/50">
           
-          {/* Header */}
           <div className="p-6 border-b border-gray-700 flex justify-between items-center shadow-lg bg-gray-900/90 backdrop-blur-sm">
             <div className="flex items-center gap-3">
               <span className="text-3xl text-blue-400">🛒</span>
@@ -97,7 +95,6 @@ export default function Cart({ isOpen, onClose }: CartProps) {
             </button>
           </div>
 
-          {/* Cart Items */}
           <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
             {cartItems.length === 0 ? (
               <div className="text-center py-12">
@@ -151,8 +148,7 @@ export default function Cart({ isOpen, onClose }: CartProps) {
               </div>
             )}
           </div>
-
-          {/* Footer */}
+          
           {cartItems.length > 0 && (
             <div className="p-6 border-t border-gray-700 space-y-4 bg-gray-900/90 backdrop-blur-sm">
               <div className="flex justify-between items-center text-xl">

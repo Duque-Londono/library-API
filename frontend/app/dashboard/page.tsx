@@ -505,7 +505,7 @@ function Cart({ isOpen, onClose }: CartProps) {
     </div>
   )
 }
-// Componente 4: Dashboard (API FIX)
+
 export default function Dashboard() {
   const [searchTerm, setSearchTerm] = useState('')
   const [books, setBooks] = useState<Book[]>([])
@@ -550,7 +550,7 @@ export default function Dashboard() {
     setLoading(true)
     try {
       const response = await axios.get(`${API_URL}/search.json`, {
-        params: { q: searchTerm, limit: 12 } // Añadimos 'limit' para mejor rendimiento
+        params: { q: searchTerm, limit: 12 } 
       })
       
       setBooks(response.data.docs || [])
