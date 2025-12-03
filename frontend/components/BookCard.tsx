@@ -21,7 +21,7 @@ export default function BookCard({ book, onClick, onAddToCart }: BookCardProps) 
 
   const coverUrl = book.cover_i
     ? `https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg`
-    : '/placeholder-book.png'
+    : 'https://placehold.co/128x192/1A202C/3182CE?text=BOOK' // Placeholder oscuro
 
   // Generar precio aleatorio entre $9.99 y $29.99
   const getBookPrice = () => {
@@ -31,13 +31,15 @@ export default function BookCard({ book, onClick, onAddToCart }: BookCardProps) 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation()
     
+    // NOTE: Using localStorage as per original code. In a production app, use Firestore.
     const cart = localStorage.getItem('cart')
     const cartItems = cart ? JSON.parse(cart) : []
     
     // Verificar si ya está en el carrito
     const existingItem = cartItems.find((item: any) => item.key === book.key)
     if (existingItem) {
-      alert('Este libro ya está en tu carrito 📚')
+      // Replaced alert with console message as per instructions
+      console.log('Este libro ya está en tu carrito 📚')
       return
     }
     
@@ -57,53 +59,59 @@ export default function BookCard({ book, onClick, onAddToCart }: BookCardProps) 
   }
 
   return (
-    <div className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all transform hover:scale-105">
+    <div className="bg-gray-800 text-gray-200 rounded-xl overflow-hidden shadow-2xl transition-all duration-300 border border-gray-700 hover:border-blue-500 hover:shadow-blue-900/50 transform hover:scale-[1.02]">
       <div
         onClick={onClick}
-        className="cursor-pointer"
+        className="cursor-pointer p-4 flex flex-col items-stretch h-full"
       >
-        <div className="h-64 bg-gradient-to-br from-purple-100 to-indigo-100 flex items-center justify-center overflow-hidden">
-          {book.cover_i ? (
-            <img
-              src={coverUrl}
-              alt={book.title}
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <div className="text-6xl">📖</div>
-          )}
+        <div className="flex justify-center mb-4">
+          <div className="w-32 h-48 bg-gray-700 rounded-lg shadow-lg overflow-hidden flex items-center justify-center flex-shrink-0">
+            {book.cover_i ? (
+              <img
+                src={coverUrl}
+                alt={book.title}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.src = 'https://placehold.co/128x192/1A202C/3182CE?text=BOOK'
+                }}
+              />
+            ) : (
+              <div className="text-4xl text-gray-400">📖</div>
+            )}
+          </div>
         </div>
-        <div className="p-4">
-          <h3 className="font-bold text-gray-800 text-lg mb-2 line-clamp-2">
+        
+        <div className="flex-1">
+          <h3 className="font-extrabold text-white text-lg mb-1 line-clamp-2">
             {book.title}
           </h3>
-          <p className="text-gray-600 text-sm mb-1">
+          <p className="text-blue-400 text-sm font-medium mb-1 line-clamp-1">
             {book.author_name?.[0] || 'Autor desconocido'}
           </p>
           {book.first_publish_year && (
             <p className="text-gray-500 text-xs mb-3">
-              {book.first_publish_year}
+              Publicado: {book.first_publish_year}
             </p>
           )}
           <div className="flex items-center justify-between">
-            <span className="text-purple-600 font-bold text-lg">
-              ${getBookPrice()} USD
+            <span className="text-yellow-400 font-bold text-xl">
+              ${getBookPrice()}
             </span>
           </div>
         </div>
       </div>
       
-      <div className="px-4 pb-4">
+      <div className="p-4 pt-0">
         <button
           onClick={handleAddToCart}
           disabled={isAdding}
-          className={`w-full py-2 rounded-lg font-semibold transition-all ${
+          className={`w-full py-2 rounded-lg font-bold text-sm uppercase tracking-wider transition-all duration-300 ${
             isAdding
-              ? 'bg-green-500 text-white'
-              : 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-700 hover:to-indigo-700'
+              ? 'bg-green-600 text-white shadow-md shadow-green-900/50'
+              : 'bg-blue-600 text-white hover:bg-blue-700 shadow-md shadow-blue-900/50'
           }`}
         >
-          {isAdding ? '✓ Agregado' : '🛒 Agregar al carrito'}
+          {isAdding ? '✓ Agregado' : '🛒 Añadir a Carrito'}
         </button>
       </div>
     </div>

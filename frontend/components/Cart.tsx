@@ -19,24 +19,32 @@ export default function Cart({ isOpen, onClose }: CartProps) {
   const [cartItems, setCartItems] = useState<CartItem[]>([])
 
   useEffect(() => {
-    loadCart()
+    // Only load cart if the component is mounted AND it's open (optimisation)
+    if (isOpen) {
+        loadCart()
+    }
   }, [isOpen])
 
   const loadCart = () => {
+    // NOTE: Using localStorage as per original code. In a production app, use Firestore.
     const cart = localStorage.getItem('cart')
     if (cart) {
       setCartItems(JSON.parse(cart))
+    } else {
+      setCartItems([])
     }
   }
 
   const removeFromCart = (key: string) => {
     const updatedCart = cartItems.filter(item => item.key !== key)
     setCartItems(updatedCart)
+    // NOTE: Using localStorage as per original code. In a production app, use Firestore.
     localStorage.setItem('cart', JSON.stringify(updatedCart))
   }
 
   const clearCart = () => {
     setCartItems([])
+    // NOTE: Using localStorage as per original code. In a production app, use Firestore.
     localStorage.removeItem('cart')
   }
 
@@ -47,115 +55,144 @@ export default function Cart({ isOpen, onClose }: CartProps) {
   const handleCheckout = () => {
     if (cartItems.length === 0) return
     
-    alert(`¡Compra realizada! Total: $${getTotalPrice()} USD\n\nGracias por tu compra 📚`)
+    // Replaced alert with console message as per instructions
+    console.log(`¡Compra realizada! Total: $${getTotalPrice()} USD. Gracias por tu compra 📚`)
     clearCart()
     onClose()
   }
 
-  if (!isOpen) return null
+  // Clases para la animación de entrada/salida
+  const drawerClasses = `
+    fixed inset-y-0 right-0 w-full md:w-96 h-full flex flex-col shadow-2xl transition-transform duration-500 ease-in-out
+    ${isOpen ? 'translate-x-0' : 'translate-x-full'}
+  `
+
+  if (!isOpen && cartItems.length === 0) return null
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-end md:items-center justify-center md:justify-end z-50"
+      className={`fixed inset-0 z-50 transition-opacity duration-500 ${isOpen ? 'bg-black bg-opacity-60 backdrop-blur-sm' : 'pointer-events-none bg-transparent'}`}
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-t-3xl md:rounded-l-3xl md:rounded-r-none w-full md:w-96 h-[80vh] md:h-full flex flex-col shadow-2xl"
+        className={drawerClasses}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="p-6 border-b border-gray-200 flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <span className="text-2xl">🛒</span>
-            <h2 className="text-2xl font-bold text-gray-800">
-              Carrito ({cartItems.length})
-            </h2>
-          </div>
-          <button
-            onClick={onClose}
-            className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-all"
-          >
-            ✕
-          </button>
-        </div>
-
-        {/* Cart Items */}
-        <div className="flex-1 overflow-y-auto p-6">
-          {cartItems.length === 0 ? (
-            <div className="text-center py-12">
-              <span className="text-6xl mb-4 block">📚</span>
-              <p className="text-gray-500 text-lg">Tu carrito está vacío</p>
-              <p className="text-gray-400 text-sm mt-2">
-                Agrega libros para comenzar tu compra
-              </p>
+        <div className="bg-gray-900 text-gray-200 h-full flex flex-col border-l border-blue-700/50">
+          
+          {/* Header */}
+          <div className="p-6 border-b border-gray-700 flex justify-between items-center shadow-lg bg-gray-900/90 backdrop-blur-sm">
+            <div className="flex items-center gap-3">
+              <span className="text-3xl text-blue-400">🛒</span>
+              <h2 className="text-2xl font-extrabold text-white">
+                Tu Carrito ({cartItems.length})
+              </h2>
             </div>
-          ) : (
-            <div className="space-y-4">
-              {cartItems.map((item) => (
-                <div
-                  key={item.key}
-                  className="bg-gray-50 rounded-xl p-4 flex gap-4 hover:bg-gray-100 transition-all"
-                >
-                  <div className="w-16 h-20 bg-gradient-to-br from-purple-100 to-indigo-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
-                    {item.cover_i ? (
-                      <img
-                        src={`https://covers.openlibrary.org/b/id/${item.cover_i}-S.jpg`}
-                        alt={item.title}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <span className="text-2xl">📖</span>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-gray-800 text-sm line-clamp-2 mb-1">
-                      {item.title}
-                    </h3>
-                    <p className="text-gray-600 text-xs mb-2">
-                      {item.author_name?.[0] || 'Autor desconocido'}
-                    </p>
-                    <p className="text-purple-600 font-bold text-sm">
-                      ${item.price.toFixed(2)} USD
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => removeFromCart(item.key)}
-                    className="text-red-500 hover:text-red-700 text-xl self-start"
+            <button
+              onClick={onClose}
+              className="w-10 h-10 rounded-full bg-gray-700 text-gray-400 hover:bg-red-600 hover:text-white flex items-center justify-center transition-all text-xl font-bold"
+              aria-label="Cerrar carrito"
+            >
+              ✕
+            </button>
+          </div>
+
+          {/* Cart Items */}
+          <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
+            {cartItems.length === 0 ? (
+              <div className="text-center py-12">
+                <span className="text-7xl mb-4 block">🌌</span>
+                <p className="text-blue-400 text-xl font-semibold">Tu carrito está vacío</p>
+                <p className="text-gray-500 text-sm mt-2">
+                  Agrega libros para empezar tu aventura de lectura
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {cartItems.map((item) => (
+                  <div
+                    key={item.key}
+                    className="bg-gray-800 rounded-xl p-4 flex gap-4 border border-gray-700 hover:border-blue-500 transition-all shadow-md"
                   >
-                    🗑️
-                  </button>
-                </div>
-              ))}
+                    <div className="w-16 h-20 bg-gray-700 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden shadow-inner">
+                      {item.cover_i ? (
+                        <img
+                          src={`https://covers.openlibrary.org/b/id/${item.cover_i}-S.jpg`}
+                          alt={item.title}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src = 'https://placehold.co/64x80/1A202C/3182CE?text=BOOK'
+                          }}
+                        />
+                      ) : (
+                        <span className="text-2xl text-gray-400">📖</span>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-bold text-white text-base line-clamp-2 mb-1">
+                        {item.title}
+                      </h3>
+                      <p className="text-blue-300 text-xs mb-2 line-clamp-1">
+                        {item.author_name?.[0] || 'Autor desconocido'}
+                      </p>
+                      <p className="text-yellow-400 font-extrabold text-lg">
+                        ${item.price.toFixed(2)} USD
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => removeFromCart(item.key)}
+                      className="text-red-500 hover:text-white bg-gray-700 p-2 rounded-full w-8 h-8 flex items-center justify-center transition-colors self-start"
+                      aria-label={`Eliminar ${item.title}`}
+                    >
+                      <span className="text-sm">🗑️</span>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Footer */}
+          {cartItems.length > 0 && (
+            <div className="p-6 border-t border-gray-700 space-y-4 bg-gray-900/90 backdrop-blur-sm">
+              <div className="flex justify-between items-center text-xl">
+                <span className="font-extrabold text-white uppercase tracking-wider">Total:</span>
+                <span className="text-3xl font-extrabold text-yellow-400">
+                  ${getTotalPrice()}
+                </span>
+              </div>
+              
+              <button
+                onClick={handleCheckout}
+                className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-blue-700 transition-all shadow-xl shadow-blue-700/50"
+              >
+                FINALIZAR COMPRA
+              </button>
+              
+              <button
+                onClick={clearCart}
+                className="w-full bg-gray-700 text-gray-300 py-3 rounded-xl font-medium hover:bg-gray-600 transition-all text-sm"
+              >
+                Vaciar Carrito
+              </button>
             </div>
           )}
         </div>
-
-        {/* Footer */}
-        {cartItems.length > 0 && (
-          <div className="p-6 border-t border-gray-200 space-y-4">
-            <div className="flex justify-between items-center text-lg">
-              <span className="font-semibold text-gray-700">Total:</span>
-              <span className="text-2xl font-bold text-purple-600">
-                ${getTotalPrice()} USD
-              </span>
-            </div>
-            
-            <button
-              onClick={handleCheckout}
-              className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-4 rounded-xl font-semibold hover:from-purple-700 hover:to-indigo-700 transition-all shadow-lg"
-            >
-              Finalizar Compra
-            </button>
-            
-            <button
-              onClick={clearCart}
-              className="w-full bg-gray-100 text-gray-700 py-3 rounded-xl font-medium hover:bg-gray-200 transition-all"
-            >
-              Vaciar Carrito
-            </button>
-          </div>
-        )}
       </div>
+      <style jsx global>{`
+        /* Custom Scrollbar for better dark mode look */
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: #1f2937; /* Gray-800 */
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background-color: #3b82f6; /* Blue-500 */
+          border-radius: 20px;
+          border: 2px solid #1f2937;
+        }
+      `}</style>
     </div>
   )
 }
